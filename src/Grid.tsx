@@ -141,11 +141,12 @@ const Grid: React.FC<GridProps> = ({ rows, columns }) => {
         )}
       </div>
       <div className="flex justify-center mt-4">
-        <div className="keypad">
+        <div className="keypad" >
           <button
             className="btn"
             onClick={() => movePlayer(Direction.Up)}
             disabled={gameOver}
+            style={{margin: '1.5em', border : 'solid 0.5em green',borderRadius : '8px', padding: '0.5em'}}
           >
             Up
           </button>
@@ -153,6 +154,7 @@ const Grid: React.FC<GridProps> = ({ rows, columns }) => {
             className="btn"
             onClick={() => movePlayer(Direction.Down)}
             disabled={gameOver}
+            style={{margin : '1.5em', border : 'solid 0.5em green',borderRadius : '8px', padding: '0.5em'}}
           >
             Down
           </button>
@@ -160,6 +162,7 @@ const Grid: React.FC<GridProps> = ({ rows, columns }) => {
             className="btn"
             onClick={() => movePlayer(Direction.Left)}
             disabled={gameOver}
+            style={{margin: '1.5em', border : 'solid 0.5em green',borderRadius : '8px' , padding: '0.5em'}}
           >
             Left
           </button>
@@ -167,12 +170,14 @@ const Grid: React.FC<GridProps> = ({ rows, columns }) => {
             className="btn"
             onClick={() => movePlayer(Direction.Right)}
             disabled={gameOver}
+            style={{margin: '1.5em', border : 'solid 0.5em green',borderRadius : '8px' , padding: '0.5em'}}
           >
             Right
           </button>
           <button
             className="btn"
             onClick={restartGame}
+            style={{margin: '1.5em', border : 'solid 0.5em green',borderRadius : '8px', padding: '0.5em'}}
           >
             Restart
           </button>
