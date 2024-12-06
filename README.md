@@ -1,22 +1,16 @@
-# cra-template-tailwindcss-typescript
+# Grid Search --Find the X! 
 
-A streamlined [Tailwind CSS v3.1](https://tailwindcss.com) template for [Create React App](https://github.com/facebook/create-react-app) in [TypeScript](https://www.typescriptlang.org/).
+**Grid Search** is a fun and interactive grid-based game where the player navigates through a grid to locate a hidden "X" target. The game features player movement, limited moves, and win/lose mechanics with retry options.
 
-> This template installs and sets up [Tailwind CSS](https://tailwindcss.com) with TypeScript support.
+---
 
-## Usage
+## Features
 
-```bash
-npx create-react-app --template tailwindcss-typescript
-```
+- **Dynamic Grid Layout**: Adjusts based on the number of rows and columns.
+- **Player Movement**: Navigate the grid using Up, Down, Left, and Right buttons.
+- **Target Location**: "X" is placed randomly on the grid.
+- **Limited Moves**: Find the "X" within the given number of moves.
+- **Retry Option**: Retry levels after losing.
+- **Styled UI**: Clean and interactive interface powered by Tailwind CSS.
 
-## Credits
-
-This project was made possible thanks to the following projects.
-
-1. [GeoffSelby/cra-template-tailwindcss](https://github.com/GeoffSelby/cra-template-tailwindcss) - A streamlined Tailwind CSS template for Create React App (in JavaScript).
-2. [cra-template-typescript](https://github.com/facebook/create-react-app/tree/master/packages/cra-template-typescript) - An official TypeScript template for create-react-app.
-
-## License
-
-MIT © [Sung M. Kim](https://sung.codes)
+---
