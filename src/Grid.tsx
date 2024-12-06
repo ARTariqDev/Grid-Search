@@ -3,6 +3,9 @@ import React, { useState, useEffect } from 'react';
 interface GridProps {
   rows: number;
   columns: number;
+  moves: number;
+  onLevelComplete: () => void;
+  onGameOver: () => void;
 }
 
 enum Direction {
@@ -12,60 +15,55 @@ enum Direction {
   Right = 'right',
 }
 
-const Grid: React.FC<GridProps> = ({ rows, columns }) => {
+const Grid: React.FC<GridProps> = ({ rows, columns, moves, onLevelComplete, onGameOver }) => {
   const [grid, setGrid] = useState<number[][]>([]);
   const [playerRow, setPlayerRow] = useState(0);
   const [playerColumn, setPlayerColumn] = useState(0);
   const [targetRow, setTargetRow] = useState<number | null>(null);
   const [targetColumn, setTargetColumn] = useState<number | null>(null);
-  const [remainingMoves, setRemainingMoves] = useState(10);
-  const [gameOver, setGameOver] = useState(false);
-  const [win, setWin] = useState(false);
-  const [gameMessage, setGameMessage] = useState('Grid Search');
+  const [remainingMoves, setRemainingMoves] = useState(moves);
+  const [showRetry, setShowRetry] = useState(false);
+
   const clickAudio = new Audio('/click.wav');
   const winAudio = new Audio('/win.wav');
   const loseAudio = new Audio('/lose.wav');
 
   useEffect(() => {
     initializeGrid();
-  }, []);
-
-  useEffect(() => {
-    if (remainingMoves === 0 || win) {
-      setGameOver(true);
-      if (win) {
-        setGameMessage('You win!');
-        winAudio.play();
-      } else {
-        setGameMessage('You lose!');
-        loseAudio.play();
-      }
-    } else {
-      setGameMessage(`Grid Search - Remaining Moves: ${remainingMoves}`);
-    }
-  }, [remainingMoves, win]);
+  }, [rows, columns, moves]);
 
   useEffect(() => {
     if (playerRow === targetRow && playerColumn === targetColumn) {
-      setWin(true);
+      winAudio.play();
+      setTimeout(onLevelComplete, 1000);
     }
   }, [playerRow, playerColumn, targetRow, targetColumn]);
+
+  useEffect(() => {
+    if (remainingMoves === 0) {
+      loseAudio.play();
+      setShowRetry(true);
+      setTimeout(onGameOver, 1000);
+    }
+  }, [remainingMoves]);
 
   const initializeGrid = () => {
     const newGrid = Array.from({ length: rows }, () =>
       Array.from({ length: columns }, () => 0)
     );
     setGrid(newGrid);
-    setTarget();
-    setGameMessage(`Grid Search - Remaining Moves: ${remainingMoves}`);
+    setPlayerRow(0);
+    setPlayerColumn(0);
+    setRemainingMoves(moves);
+    setRandomTarget(rows, columns);
   };
 
-  const setTarget = () => {
+  const setRandomTarget = (rows: number, columns: number) => {
     const randomRow = Math.floor(Math.random() * rows);
     const randomColumn = Math.floor(Math.random() * columns);
 
     if (randomRow === playerRow && randomColumn === playerColumn) {
-      setTarget();
+      setRandomTarget(rows, columns);
       return;
     }
 
@@ -74,115 +72,108 @@ const Grid: React.FC<GridProps> = ({ rows, columns }) => {
   };
 
   const movePlayer = (direction: Direction) => {
-    if (!gameOver) {
-      clickAudio.play();
-      let newRow = playerRow;
-      let newColumn = playerColumn;
+    let newRow = playerRow;
+    let newColumn = playerColumn;
 
-      switch (direction) {
-        case Direction.Up:
-          if (playerRow > 0) newRow = playerRow - 1;
-          break;
-        case Direction.Down:
-          if (playerRow < rows - 1) newRow = playerRow + 1;
-          break;
-        case Direction.Left:
-          if (playerColumn > 0) newColumn = playerColumn - 1;
-          break;
-        case Direction.Right:
-          if (playerColumn < columns - 1) newColumn = playerColumn + 1;
-          break;
-        default:
-          break;
-      }
+    switch (direction) {
+      case Direction.Up:
+        if (playerRow > 0) newRow = playerRow - 1;
+        break;
+      case Direction.Down:
+        if (playerRow < rows - 1) newRow = playerRow + 1;
+        break;
+      case Direction.Left:
+        if (playerColumn > 0) newColumn = playerColumn - 1;
+        break;
+      case Direction.Right:
+        if (playerColumn < columns - 1) newColumn = playerColumn + 1;
+        break;
+      default:
+        break;
+    }
 
+    if (newRow !== playerRow || newColumn !== playerColumn) {
       setPlayerRow(newRow);
       setPlayerColumn(newColumn);
       setRemainingMoves(remainingMoves - 1);
+      clickAudio.play();
     }
   };
 
-  const restartGame = () => {
-    setPlayerRow(0);
-    setPlayerColumn(0);
-    setWin(false);
-    setRemainingMoves(10);
-    setGameOver(false);
+  const retryLevel = () => {
+    setShowRetry(false);
     initializeGrid();
   };
 
   return (
-    <div className="h-screen flex flex-col justify-center items-center bg-gray-100">
-      <h1 className="text-4xl font-bold text-tomato font-quicksand mb-4">
-        {gameMessage}
-      </h1>
-      <div className="grid" style={{ gridTemplateColumns: `repeat(${columns}, 60px)` }}>
+    <div className="flex flex-col items-center">
+      <div
+        className="grid gap-1"
+        style={{ gridTemplateColumns: `repeat(${columns}, 50px)`, backgroundColor: 'black' }}
+      >
         {grid.map((row, rowIndex) =>
-          row.map((cell, colIndex) => (
+          row.map((_, colIndex) => (
             <div
               key={`${rowIndex}-${colIndex}`}
-              className={`p-4 border ${
+              className={`p-4 border rounded ${
                 playerRow === rowIndex && playerColumn === colIndex
-                  ? 'bg-blue-500'
+                  ? 'bg-blue-500 text-white' // Player's position
                   : ''
               }`}
             >
-              {(win &&
-                rowIndex === targetRow &&
-                colIndex === targetColumn) ||
-              (rowIndex === playerRow &&
-                colIndex === playerColumn &&
-                gameOver &&
-                win)
-                ? 'X'
-                : ''}
+              {targetRow === rowIndex && targetColumn === colIndex && (
+                <div
+                  className={`absolute bg-red-500 text-white p-2 rounded-full w-6 h-6 flex items-center justify-center ${
+                    playerRow === rowIndex && playerColumn === colIndex ? 'visible' : 'invisible'
+                  }`}
+                >
+                  X
+                </div>
+              )}
             </div>
           ))
         )}
       </div>
-      <div className="flex justify-center mt-4">
-        <div className="keypad" >
+      <div className="flex flex-col mt-4 gap-2">
+        <button
+          onClick={() => movePlayer(Direction.Up)}
+          className="btn-dpad border border-gray-300 rounded-md hover:bg-blue-600 hover:text-white transition-colors duration-200"
+          style={{color : 'white'}}
+        >
+          Up
+        </button>
+        <div className="flex gap-2">
           <button
-            className="btn"
-            onClick={() => movePlayer(Direction.Up)}
-            disabled={gameOver}
-            style={{margin: '1.5em', border : 'solid 0.5em green',borderRadius : '8px', padding: '0.5em'}}
-          >
-            Up
-          </button>
-          <button
-            className="btn"
-            onClick={() => movePlayer(Direction.Down)}
-            disabled={gameOver}
-            style={{margin : '1.5em', border : 'solid 0.5em green',borderRadius : '8px', padding: '0.5em'}}
-          >
-            Down
-          </button>
-          <button
-            className="btn"
             onClick={() => movePlayer(Direction.Left)}
-            disabled={gameOver}
-            style={{margin: '1.5em', border : 'solid 0.5em green',borderRadius : '8px' , padding: '0.5em'}}
+            className="btn-dpad border border-gray-300 rounded-md hover:bg-blue-600 hover:text-white transition-colors duration-200"
+            style={{color : 'white'}}
           >
             Left
           </button>
           <button
-            className="btn"
             onClick={() => movePlayer(Direction.Right)}
-            disabled={gameOver}
-            style={{margin: '1.5em', border : 'solid 0.5em green',borderRadius : '8px' , padding: '0.5em'}}
+            className="btn-dpad border border-gray-300 rounded-md hover:bg-blue-600 hover:text-white transition-colors duration-200"
+            style={{color : 'white'}}
           >
             Right
           </button>
-          <button
-            className="btn"
-            onClick={restartGame}
-            style={{margin: '1.5em', border : 'solid 0.5em green',borderRadius : '8px', padding: '0.5em'}}
-          >
-            Restart
+        </div>
+        <button
+          onClick={() => movePlayer(Direction.Down)}
+          className="btn-dpad border border-gray-300 rounded-md hover:bg-blue-600 hover:text-white transition-colors duration-200"
+          style={{color : 'white'}}
+        >
+          Down
+        </button>
+      </div>
+      <p className="mt-2 text-white">Remaining Moves: {remainingMoves}</p>
+      {showRetry && (
+        <div className="mt-4">
+          <button onClick={retryLevel} className="btn-retry border border-gray-300 rounded-md hover:bg-red-600 hover:text-white transition-colors duration-200" style={{color : 'white'}}>
+            Retry Level
           </button>
         </div>
-      </div>
+      )}
     </div>
   );
 };
