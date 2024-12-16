@@ -74,22 +74,23 @@ const Grid: React.FC<GridProps> = ({ rows, columns, moves, onLevelComplete, onGa
   const movePlayer = (direction: Direction) => {
     let newRow = playerRow;
     let newColumn = playerColumn;
-
-    switch (direction) {
-      case Direction.Up:
-        if (playerRow > 0) newRow = playerRow - 1;
-        break;
-      case Direction.Down:
-        if (playerRow < rows - 1) newRow = playerRow + 1;
-        break;
-      case Direction.Left:
-        if (playerColumn > 0) newColumn = playerColumn - 1;
-        break;
-      case Direction.Right:
-        if (playerColumn < columns - 1) newColumn = playerColumn + 1;
-        break;
-      default:
-        break;
+    if (remainingMoves > 0) {
+      switch (direction) {
+        case Direction.Up:
+          if (playerRow > 0) newRow = playerRow - 1;
+          break;
+        case Direction.Down:
+          if (playerRow < rows - 1) newRow = playerRow + 1;
+          break;
+        case Direction.Left:
+          if (playerColumn > 0) newColumn = playerColumn - 1;
+          break;
+        case Direction.Right:
+          if (playerColumn < columns - 1) newColumn = playerColumn + 1;
+          break;
+        default:
+          break;
+      }
     }
 
     if (newRow !== playerRow || newColumn !== playerColumn) {
@@ -124,7 +125,7 @@ const Grid: React.FC<GridProps> = ({ rows, columns, moves, onLevelComplete, onGa
               {targetRow === rowIndex && targetColumn === colIndex && (
                 <div
                   className={`absolute bg-red-500 text-white p-2 rounded-full w-6 h-6 flex items-center justify-center ${
-                    playerRow === rowIndex && playerColumn === colIndex ? 'visible' : 'invisible'
+                    ((playerRow === rowIndex) && (playerColumn === colIndex)) || (remainingMoves === 0) ? 'visible' : 'invisible'
                   }`}
                 >
                   X
