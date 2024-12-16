@@ -46,7 +46,7 @@ const App: React.FC = () => {
 
   return (
     <div className="h-screen flex flex-col justify-center items-center bg-black">
-      <h1 className="text-4xl font-bold mb-4 text-center" style={{color : 'white'}}>Grid Search - Find the X!</h1>
+      <h1 className="text-4xl font-bold mb-4 text-center" style={{color : 'white',fontFamily : "monospace,monospace"}}>Grid Search - Find the X!</h1>
       <Grid
         rows={levels[currentLevelIndex].rows}
         columns={levels[currentLevelIndex].columns}
@@ -54,6 +54,7 @@ const App: React.FC = () => {
         onLevelComplete={handleLevelComplete}
         onGameOver={handleGameOver}
       />
+      <h2 style={{color : 'yellow',fontFamily : "monospace"}}>Tip: you can also use WASD/arrow keys to move</h2>
       <div className="mt-4">
         {gameStatus && <p className="text-lg text-center">{gameStatus}</p>}
         <button onClick={resetGame} className="btn-reset" style={{color : 'white'}}>

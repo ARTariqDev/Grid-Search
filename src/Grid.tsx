@@ -47,6 +47,42 @@ const Grid: React.FC<GridProps> = ({ rows, columns, moves, onLevelComplete, onGa
     }
   }, [remainingMoves]);
 
+  // Add keydown event listener for WASD/Arrow keys
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (remainingMoves === 0) return; // Ignore input if no moves left
+      switch (e.key) {
+        case 'ArrowUp':
+        case 'w':
+        case 'W':
+          movePlayer(Direction.Up);
+          break;
+        case 'ArrowDown':
+        case 's':
+        case 'S':
+          movePlayer(Direction.Down);
+          break;
+        case 'ArrowLeft':
+        case 'a':
+        case 'A':
+          movePlayer(Direction.Left);
+          break;
+        case 'ArrowRight':
+        case 'd':
+        case 'D':
+          movePlayer(Direction.Right);
+          break;
+        default:
+          break;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [remainingMoves, playerRow, playerColumn]);
+
   const initializeGrid = () => {
     const newGrid = Array.from({ length: rows }, () =>
       Array.from({ length: columns }, () => 0)
@@ -139,7 +175,7 @@ const Grid: React.FC<GridProps> = ({ rows, columns, moves, onLevelComplete, onGa
         <button
           onClick={() => movePlayer(Direction.Up)}
           className="btn-dpad border border-gray-300 rounded-md hover:bg-blue-600 hover:text-white transition-colors duration-200"
-          style={{color : 'white'}}
+          style={{ color: 'white' }}
         >
           Up
         </button>
@@ -147,14 +183,14 @@ const Grid: React.FC<GridProps> = ({ rows, columns, moves, onLevelComplete, onGa
           <button
             onClick={() => movePlayer(Direction.Left)}
             className="btn-dpad border border-gray-300 rounded-md hover:bg-blue-600 hover:text-white transition-colors duration-200"
-            style={{color : 'white'}}
+            style={{ color: 'white' }}
           >
             Left
           </button>
           <button
             onClick={() => movePlayer(Direction.Right)}
             className="btn-dpad border border-gray-300 rounded-md hover:bg-blue-600 hover:text-white transition-colors duration-200"
-            style={{color : 'white'}}
+            style={{ color: 'white' }}
           >
             Right
           </button>
@@ -162,7 +198,7 @@ const Grid: React.FC<GridProps> = ({ rows, columns, moves, onLevelComplete, onGa
         <button
           onClick={() => movePlayer(Direction.Down)}
           className="btn-dpad border border-gray-300 rounded-md hover:bg-blue-600 hover:text-white transition-colors duration-200"
-          style={{color : 'white'}}
+          style={{ color: 'white' }}
         >
           Down
         </button>
@@ -170,7 +206,11 @@ const Grid: React.FC<GridProps> = ({ rows, columns, moves, onLevelComplete, onGa
       <p className="mt-2 text-white">Remaining Moves: {remainingMoves}</p>
       {showRetry && (
         <div className="mt-4">
-          <button onClick={retryLevel} className="btn-retry border border-gray-300 rounded-md hover:bg-red-600 hover:text-white transition-colors duration-200" style={{color : 'white'}}>
+          <button
+            onClick={retryLevel}
+            className="btn-retry border border-gray-300 rounded-md hover:bg-red-600 hover:text-white transition-colors duration-200"
+            style={{ color: 'white' }}
+          >
             Retry Level
           </button>
         </div>
